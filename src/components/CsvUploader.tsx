@@ -74,24 +74,38 @@ export default function CsvUploader({
     });
   };
 
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+  const counter = useRef(0);
+
+  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    setIsDragging(true);
+
+    counter.current++;
+
+    if (counter.current === 1) setIsDragging(true);
   };
 
   const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    setIsDragging(false);
+
+    counter.current--;
+
+    if (counter.current === 0) setIsDragging(false);
   };
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
+
+    counter.current = 0;
     setIsDragging(false);
 
     const files = e.dataTransfer.files;
     if (files && files[0]) {
       processFile(files[0]);
     }
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
   };
 
   return (
@@ -105,18 +119,39 @@ export default function CsvUploader({
       />
 
       <div
-        onDragOver={handleDragOver}
+        onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
+        onDragOver={handleDragOver}
         onClick={() => fileInputRef.current?.click()}
-        className={`mt-1 flex flex-col items-center justify-center w-full p-6
-                   border-2 border-dashed rounded-xl transition-colors cursor-pointer
-                   ${
-                     isDragging
-                       ? "border-fuchsia-500 bg-fuchsia-500/10"
-                       : "border-gray-300 hover:border-gray-400 bg-gray-50"
-                   }`}
+        className={`
+    group relative mt-1 flex w-full flex-col items-center justify-center
+    rounded-xl border-2 border-dashed p-6
+    transition-all duration-300 ease-in-out cursor-pointer
+    ${
+      isDragging
+        ? "scale-105 border-fuchsia-400 bg-fuchsia-100 shadow-xl"
+        : "border-gray-300 bg-gray-50 hover:border-fuchsia-400 hover:bg-white hover:shadow-md"
+    }
+  `}
+
+        // className={`mt-1 flex flex-col items-center justify-center w-full p-6
+        //            border-2 border-dashed rounded-xl transition-colors cursor-pointer
+        //            ${
+        //              isDragging
+        //                ? "border-fuchsia-500 bg-fuchsia-500/10"
+        //                : "border-gray-300 hover:border-gray-400 bg-gray-50"
+        //            }`}
       >
+        <div
+          className={`
+    pointer-events-none absolute inset-0 rounded-xl
+    ring-2 ring-fuchsia-400 ring-offset-2
+    transition-all duration-300 ease-in-out
+    ${isDragging ? "opacity-100 scale-100" : "opacity-0 scale-95"}
+  `}
+        ></div>
+
         <div className="text-center">
           <UploadCloud
             className={`mx-auto h-12 w-12 text-gray-400 ${

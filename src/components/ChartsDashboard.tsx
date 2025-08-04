@@ -32,7 +32,10 @@ export default function ChartsDashboard({
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 ">
       {metricNames.map((metric) => (
-        <div key={metric} className="bg-white p-4 rounded-xl shadow-md">
+        <div
+          key={metric}
+          className="bg-white p-4 rounded-xl border-2 border-fuchsia-300"
+        >
           <h3 className="text-xl font-semibold mb-2 capitalize">
             {metric.replace(/_/g, " ")}
           </h3>

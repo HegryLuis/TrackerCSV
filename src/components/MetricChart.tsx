@@ -9,6 +9,8 @@ import {
   Legend,
   ResponsiveContainer,
   Brush,
+  Area,
+  AreaChart,
 } from "recharts";
 import { memo } from "react";
 
@@ -53,12 +55,15 @@ const MetricChart = memo(({ data, lines }: MetricChartProps) => {
     return [min - (max - min) * 0.1, max + (max - min) * 0.1];
   })();
 
+  const previewLineId = lines[0];
+
   return (
     <div className="w-full h-[350px]">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
           data={sortedData}
           margin={{ top: 5, right: 20, left: -10, bottom: 5 }}
+          syncId={`chart-${Math.random()}`}
         >
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="step" />
@@ -82,7 +87,27 @@ const MetricChart = memo(({ data, lines }: MetricChartProps) => {
             />
           ))}
 
-          <Brush dataKey="step" height={30} stroke="#8884d8" />
+          <Brush
+            dataKey="step"
+            height={40}
+            stroke="#8884d8"
+            travellerWidth={15}
+          >
+            <LineChart data={sortedData}>
+              {lines.map((lineId, index) => (
+                <Line
+                  key={`brush-${lineId}`}
+                  type="monotone"
+                  dataKey={lineId}
+                  stroke={COLORS[index % COLORS.length]}
+                  strokeWidth={1}
+                  dot={false}
+                  connectNulls={true}
+                  isAnimationActive={false}
+                />
+              ))}
+            </LineChart>
+          </Brush>
         </LineChart>
       </ResponsiveContainer>
     </div>

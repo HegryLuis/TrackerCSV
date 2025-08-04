@@ -7,46 +7,11 @@ interface ChartsDashboardProps {
   selectedIds: string[];
 }
 
-type ChartData = {
-  [metricName: string]: {
-    step: number;
-    [experimentId: string]: number;
-  }[];
-};
-
-const prepareDataForCharts = (
-  data: ExperimentDataPoint[],
-  ids: string[]
-): ChartData => {
-  if (ids.length === 0) return {};
-
-  const filteredData = data.filter((d) => ids.includes(d.experiment_id));
-
-  return filteredData.reduce<ChartData>((acc, curr) => {
-    const { metric_name, step, value, experiment_id } = curr;
-
-    if (!acc[metric_name]) {
-      acc[metric_name] = [];
-    }
-
-    let stepObject = acc[metric_name].find((item) => item.step === step);
-
-    if (!stepObject) {
-      stepObject = { step };
-      acc[metric_name].push(stepObject);
-    }
-
-    stepObject[experiment_id] = value;
-
-    return acc;
-  }, {});
-};
-
 export default function ChartsDashboard({
   allData,
   selectedIds,
 }: ChartsDashboardProps) {
-  const { chartData, isCalculating } = useChartDataWorker(allData, selectedIds);
+  const { chartData } = useChartDataWorker(allData, selectedIds);
   const metricNames = Object.keys(chartData);
 
   if (selectedIds.length === 0) {

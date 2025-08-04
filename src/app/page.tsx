@@ -1,7 +1,6 @@
 "use client";
 import { useState } from "react";
 import { ExperimentDataPoint } from "@/types";
-import FileUpload from "@/components/FileUpload";
 import ExperimentList from "@/components/ExperimentList";
 import ChartsDashboard from "@/components/ChartsDashboard";
 import CsvUploader from "@/components/CsvUploader";

@@ -36,17 +36,26 @@ export default function CsvUploader({
     setFile(file);
     setIsLoading(true);
 
+    const isExperimentDataPoint = (
+      row: unknown
+    ): row is ExperimentDataPoint => {
+      if (typeof row !== "object" || row === null) {
+        return false;
+      }
+      const point = row as Record<string, unknown>;
+      return (
+        typeof point.experiment_id === "string" &&
+        typeof point.metric_name === "string" &&
+        typeof point.step === "number" &&
+        typeof point.value === "number"
+      );
+    };
+
     Papa.parse(file, {
       header: true,
       dynamicTyping: true,
       complete: (results) => {
-        const cleanData = results.data.filter(
-          (row: any) =>
-            row.experiment_id &&
-            row.metric_name &&
-            row.step !== undefined &&
-            row.value !== undefined
-        ) as ExperimentDataPoint[];
+        const cleanData = results.data.filter(isExperimentDataPoint);
 
         if (cleanData.length === 0) {
           setError("The CSV file is empty or has an invalid format.");
@@ -57,7 +66,7 @@ export default function CsvUploader({
         onDataParsed(cleanData);
         setIsLoading(false);
       },
-      error: (error: any) => {
+      error: (error: Error) => {
         console.error("Error parsing CSV:", error);
         setError("Failed to parse the CSV file. Please check its format.");
         setIsLoading(false);
